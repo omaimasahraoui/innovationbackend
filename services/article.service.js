@@ -49,35 +49,14 @@ function getById(_id) {
     return deferred.promise;
 }
 
-function createArticle(req,res) {
+function createArticle(articleParam) {
     var deferred = Q.defer();
-
-    // validation
-    db.articles.findOne(
-        { title: req.body.title },
-        function (err, article) {
-            if (err) deferred.reject(err.name + ': ' + err.message);
-
-            if (article) {
-                // articlename already exists
-                deferred.reject('Article Title "' + body.title + '" is already taken');
-            } else {
-                createArticle();
-            }
-        });
-
-    function createArticle() {
-
-
         db.articles.insert(
-            article,
+            articleParam,
             function (err, doc) {
                 if (err) deferred.reject(err.name + ': ' + err.message);
-
                 deferred.resolve();
             });
-    }
-
     return deferred.promise;
 }
 

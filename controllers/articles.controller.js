@@ -13,7 +13,7 @@ router.post('/', createArticle);
 
 module.exports = router;
 function createArticle(req,res) {
-    articleService.createArticle(req.body.title,req.body.introduction,req.body.corps)
+    articleService.createArticle(req.body)
         .then(function(articles) {
             res.send(articles);
         })
