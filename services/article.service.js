@@ -4,7 +4,9 @@ var bodyParser = require('body-parser');
 var bcrypt = require('bcryptjs');
 var Q = require('q');
 var mongo = require('mongoskin');
-var db = mongo.db(config.connectionString, { native_parser: true });
+var db = mongo.db(config.connectionString, {
+    native_parser: true
+});
 db.bind('articles');
 
 var service = {};
@@ -25,9 +27,9 @@ function getAll() {
 
     db.articles.find().toArray(function (err, articles) {
         if (err) deferred.reject(err.name + ': ' + err.message);
-
-
-        deferred.resolve(articles);
+        if (articles) {
+            deferred.resolve(articles);
+        }
     });
 
     return deferred.promise;
@@ -40,7 +42,7 @@ function getById(_id) {
         if (err) deferred.reject(err.name + ': ' + err.message);
 
         if (article) {
-       
+
             // article not found
             deferred.resolve();
         }
@@ -51,12 +53,12 @@ function getById(_id) {
 
 function createArticle(articleParam) {
     var deferred = Q.defer();
-        db.articles.insert(
-            articleParam,
-            function (err, doc) {
-                if (err) deferred.reject(err.name + ': ' + err.message);
-                deferred.resolve();
-            });
+    db.articles.insert(
+        articleParam,
+        function (err, doc) {
+            if (err) deferred.reject(err.name + ': ' + err.message);
+            deferred.resolve();
+        });
     return deferred.promise;
 }
 
@@ -69,8 +71,9 @@ function update(_id, articleParam) {
 
         if (article.title !== articlerParam.title) {
             // articletitle has changed so check if the new articletitle is already taken
-            db.articles.findOne(
-                { title: articleParam.title },
+            db.articles.findOne({
+                    title: articleParam.title
+                },
                 function (err, article) {
                     if (err) deferred.reject(err.name + ': ' + err.message);
 
@@ -89,19 +92,21 @@ function update(_id, articleParam) {
     function updateArticle() {
         // fields to update
         var set = {
-    title: articleParam.title, 
-    Introduction: articleParam.Introduction,
-    corps:articleParam.corps,
-    url_img: articleParam.url_img,
-    add_date: articleParam.add_date,
+            title: articleParam.title,
+            Introduction: articleParam.Introduction,
+            corps: articleParam.corps,
+            url_img: articleParam.url_img,
+            add_date: articleParam.add_date,
 
 
         };
 
-      
-        db.articles.update(
-            { _id: mongo.helper.toObjectID(_id) },
-            { $set: set },
+
+        db.articles.update({
+                _id: mongo.helper.toObjectID(_id)
+            }, {
+                $set: set
+            },
             function (err, doc) {
                 if (err) deferred.reject(err.name + ': ' + err.message);
 
@@ -115,8 +120,9 @@ function update(_id, articleParam) {
 function _delete(_id) {
     var deferred = Q.defer();
 
-    db.articles.remove(
-        { _id: mongo.helper.toObjectID(_id) },
+    db.articles.remove({
+            _id: mongo.helper.toObjectID(_id)
+        },
         function (err) {
             if (err) deferred.reject(err.name + ': ' + err.message);
 
