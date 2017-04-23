@@ -31,6 +31,8 @@ function authenticate(username, password) {
                 username: user.username,
                 firstName: user.firstName,
                 lastName: user.lastName,
+                user_type: user.usertype,   // Personne ou Entreprise
+                user_avatar : user.avatar,
                 token: jwt.sign({ sub: user._id }, config.secret)
             });
         } else {
@@ -98,6 +100,13 @@ function create(userParam) {
         // set user object to userParam without the cleartext password
         var user = _.omit(userParam, 'password');
 
+        // set avatar url
+        if(userParam.usertype.display === 'Personne'){  
+            user.avatar_url ="/assets/avatar.jpg"
+        }else{
+                 user.avatar_url ="/assets/avatar_entreprise.jpg"
+        }
+
         // add hashed password to user object
         user.hash = bcrypt.hashSync(userParam.password, 10);
 
@@ -140,11 +149,18 @@ function update(_id, userParam) {
     });
 
     function updateUser() {
+        if(userParam.usertype.display === 'Personne'){
+            avatar='/assets/avatar.jpg';
+        }else{
+            avatar="/assets/avatar_entreprise.jpg";
+        }
         // fields to update
         var set = {
             firstName: userParam.firstName,
             lastName: userParam.lastName,
             username: userParam.username,
+            usertype: userParam.usertype,
+            avatar_url:avatar
         };
 
         // update password if it was entered
